@@ -588,6 +588,61 @@ getKnightMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- 	H = [Piece,Turn,F,R],
 /* KNIGHT MOVES END HERE */
 /*====================================================================================================================*/
 
+/*====================================================================================================================*/
+/* KING MOVES START HERE */
+
+getKingMoves(piecePosition(Piece,Turn,F,R), Board, Moves):-     Curr=[Piece,Turn,F,R],
+													            PosI = [Piece,Turn,F,R],
+																getKingMoveInDirection(Curr, [],Board,M,PosI,1,1),
+																getKingMoveInDirection(Curr, M,Board,N,PosI,1,2),
+																getKingMoveInDirection(Curr, N,Board,O,PosI,-1,-1),
+																getKingMoveInDirection(Curr, O,Board,P,PosI,-1,-2),
+																getKingMoveInDirection(Curr, P,Board,Q,PosI,1,-1),
+																getKingMoveInDirection(Curr, Q,Board,R1,PosI,1,0),
+																getKingMoveInDirection(Curr, R1,Board,S,PosI,0,-1),
+																getKingMoveInDirection(Curr, S,Board,T,PosI,0,1),
+																getKingMoveInDirection(Curr, T,Board,U,PosI,-1,0),
+																getKingMoveInDirection(Curr, U,Board,V,PosI,-1,1),
+																getKingMoveInDirection(Curr, V,Board,W,PosI,2,1),
+																getKingMoveInDirection(Curr, W,Board,Moves,PosI,-2,-1).
+
+%% 1st quad
+getKingMoveInDirection([],Moves,Board,Moves,PosI,A1,B1).						
+getKingMoveInDirection( H, M,Board,Moves,PosI,A1,B1):-  H = [Piece,Turn,F,R],
+								                        R1 is R+B1,
+								                        F1 is F+A1,
+								                        \+member(piecePosition(_,_,F1,R1),Board),
+								                        inboard(F1,R1),!,
+								                        PosI = [_,Turn,A,B],
+								                        Moves = [[Piece,A,B,F1,R1]|M].
+
+getKingMoveInDirection( H, M,Board,Moves,PosI,A1,B1):- 	H = [Piece,Turn,F,R],
+								                        R1 is R+B1,
+								                        F1 is F+A1,
+								                        inboard(F1,R1),
+								                        switch(Turn,OpponentTurn),
+								                        member(piecePosition(_,OpponentTurn,F1,R1),Board),!,
+								                        PosI = [_,Turn,A,B],
+								                        Moves = [[Piece,A,B,F1,R1]|M];
+								                        Moves = M.
+
+/* KING MOVES END HERE */
+/*====================================================================================================================*/
+
+/*====================================================================================================================*/
+/* QUEEN MOVES END HERE */
+
+getQueenMoves(piecePosition(Piece,Turn,X,Y),Board,Moves):-  Curr=[Piece,F,R],
+														    PosI = [Piece,F,R],
+														    getRookMoves(piecePosition(Piece,Turn,X,Y),Board,M),
+															getBishopMoves(piecePosition(Piece,Turn,X,Y),Board,N).
+															append(N,M,Moves).	
+
+/* QUEEN MOVES END HERE */
+/*====================================================================================================================*/
+
+
+
 /* Checks if the position X,Y on the board is vacant */
 isVacant(piecePosition(_,_,X,Y), Board) :- \+member(piecePosition(_,_,X,Y), Board).
 
@@ -595,7 +650,7 @@ isVacant(piecePosition(_,_,X,Y), Board) :- \+member(piecePosition(_,_,X,Y), Boar
 isWithinBoard(X,R) :- inBoard(X,R).
 					
 inboard(1,R):-	R> 0,
-				R< 7.
+                R< 7.
 inboard(2,R):-	R> 0,
 				R< 8.
 inboard(3,R):-	R> 0,
