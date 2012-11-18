@@ -516,26 +516,25 @@ getRookMovesInDirection6( H, M,Board,Moves,PosI):-
 
 getBishopMoves(piecePosition(Piece,Turn,F,R), Board, Moves):-  Curr=[Piece,Turn,F,R],
 													PosI = [Piece,Turn,F,R],
-													getBishopMovesInDirection1(Curr, [],Board,Moves1,PosI),
-													getBishopMovesInDirection2(Curr, Moves1,Board,Moves2,PosI),
-													getBishopMovesInDirection3(Curr, Moves2,Board,Moves3,PosI),
-													getBishopMovesInDirection4(Curr, Moves3,Board,Moves4,PosI),
-													getBishopMovesInDirection5(Curr, Moves4,Board,Moves5,PosI),
-													getBishopMovesInDirection6(Curr, Moves5,Board,Moves,PosI).
+													getBishopMovesInDirection(Curr, [],Board,Moves1,PosI,1,2),
+													getBishopMovesInDirection(Curr, Moves1,Board,Moves2,PosI,-1,-2),
+													getBishopMovesInDirection(Curr, Moves2,Board,Moves3,PosI,-1,1),
+													getBishopMovesInDirection(Curr, Moves3,Board,Moves4,PosI,1,-1),
+													getBishopMovesInDirection(Curr, Moves4,Board,Moves5,PosI,2,1),
+													getBishopMovesInDirection(Curr, Moves5,Board,Moves,PosI,-2,-1).
 
-%% 1st quad
-getBishopMovesInDirection1([],Moves,Board,Moves,PosI).						
-getBishopMovesInDirection1( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
-								R1 is R+2,
-								F1 is F+1,
+getBishopMovesInDirection([],Moves,Board,Moves,PosI,A1,B1).						
+getBishopMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- H = [Piece,Turn,F,R],
+								R1 is R+B1,
+								F1 is F+A1,
 								\+member(piecePosition(_,_,F1,R1),Board),
 								inboard(F1,R1),!,
 								PosI = [_,Turn,A,B],
 								getBishopMovesInDirection1([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
 
-getBishopMovesInDirection1( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
-								R1 is R+2,
-								F1 is F+1,
+getBishopMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- 	H = [Piece,Turn,F,R],
+								R1 is R+B1,
+								F1 is F+A1,
 								inboard(F1,R1),
 								switch(Turn,OpponentTurn),
 								member(piecePosition(_,OpponentTurn,F1,R1),Board),!,
@@ -545,115 +544,49 @@ getBishopMovesInDirection1( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
 								
 
 
-%% 3rd quad
-getBishopMovesInDirection2([],Moves,Board,Moves,PosI).						
-getBishopMovesInDirection2( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
-								R1 is R-2,
-								F1 is F-1,
-								\+member(piecePosition(_,_,F1,R1),Board),
-								inboard(F1,R1),!,
-								PosI = [_,Turn,A,B],
-								getBishopMovesInDirection2([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
-
-getBishopMovesInDirection2( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
-								R1 is R-2,
-								F1 is F-1,
-								inboard(F1,R1),
-								switch(Turn,OpponentTurn),
-								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
-								PosI = [_,Turn,A,B],
-								Moves = [[Piece,A,B,F1,R1]|M];
-								Moves = M.
 
 
-
-
-%% 4th quad
-getBishopMovesInDirection3([],Moves,Board,Moves,PosI).						
-getBishopMovesInDirection3( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
-								F1 is F+1,
-								R1 is R-1,
-								\+member(piecePosition(_,_,F1,R1),Board),
-								inboard(F1,R1),!,
-								PosI = [_,Turn,A,B],
-								getBishopMovesInDirection3([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
-
-getBishopMovesInDirection3( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
-								F1 is F-1,
-								R1 is R-1,
-								inboard(F1,R1),
-								switch(Turn,OpponentTurn),
-								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
-								PosI = [_,Turn,A,B],
-								Moves = [[Piece,A,B,F1,R1]|M];
-								Moves = M.
-								
-
-%% 2nd quad
-
-getBishopMovesInDirection4([],Moves,Board,Moves,PosI).						
-getBishopMovesInDirection4( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
-								R1 is R+1,
-								F1 is F-1,
-								\+member(piecePosition(_,_,F1,R1),Board),
-								inboard(F1,R1),!,
-								PosI = [_,Turn,A,B],
-								getBishopMovesInDirection4([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
-
-getBishopMovesInDirection4( H ,M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
-								F1 is F-1,
-								R1 is R+1,
-								inboard(F1,R1),
-								switch(Turn,OpponentTurn),
-								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
-								PosI = [_,Turn,A,B],
-								Moves = [[Piece,A,B,F1,R1]|M];
-								Moves = M.
-
-%% positive x axis
-							
-getBishopMovesInDirection5([],Moves,Board,Moves).						
-getBishopMovesInDirection5( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
-								R1 is R+1,
-								F1 is F+2,
-								\+member(piecePosition(_,_,F1,R1),Board),
-								inboard(F1,R1),!,
-								PosI = [_,Turn,A,B],
-								getBishopMovesInDirection5([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
-
-
-getBishopMovesInDirection5( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
-								R1 is R+1,
-								F1 is F+2,
-								inboard(F1,R1),
-								switch(Turn,OpponentTurn),
-								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
-								PosI = [_,Turn,A,B],
-								Moves = [[Piece,A,B,F1,R1]|M];
-								Moves = M.
-
-%% negative x axis
-getBishopMovesInDirection6([],Moves,Board,Moves,PosI).						
-getBishopMovesInDirection6( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
-								R1 is R-1,
-								F1 is F-2,
-								\+member(piecePosition(_,_,F1,R1),Board),
-								inboard(F1,R1),!,
-								PosI = [_,Turn,A,B],
-								getBishopMovesInDirection6([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
-
-getBishopMovesInDirection6( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
-								R1 is R-1,
-								F1 is F-2,
-								inboard(F1,R1),
-								switch(Turn,OpponentTurn),
-								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
-								PosI = [_,Turn,A,B],
-								Moves = [[Piece,A,B,F1,R1]|M];
-								Moves = M.
 /* BISHOP MOVES END HERE */
 /*====================================================================================================================*/
 
+/*====================================================================================================================*/
+/* KNIGHT MOVES START HERE */
+getKnightMoves(piecePosition(Piece,Turn,F,R), Board, Moves):-  Curr=[Piece,Turn,F,R],
+													PosI = [Piece,Turn,F,R],
+																getKnightMovesInDirection(Curr, [],Board,Moves1,PosI,1,3),
+																getKnightMovesInDirection(Curr, Moves1,Board,Moves2,PosI,-1,2),
+																getKnightMovesInDirection(Curr, Moves2,Board,Moves3,PosI,2,3),
+																getKnightMovesInDirection(Curr, Moves3,Board,Moves4,PosI,3,2),
+																getKnightMovesInDirection(Curr, Moves4,Board,Moves5,PosI,2,-1),
+																getKnightMovesInDirection(Curr, Moves5,Board,Moves6,PosI,3,1),
+																getKnightMovesInDirection(Curr, Moves6,Board,Moves7,PosI,1,-2),
+																getKnightMovesInDirection(Curr, Moves7,Board,Moves8,PosI,-1,-3),
+																getKnightMovesInDirection(Curr, Moves8,Board,Moves9,PosI,-3,-2),
+																getKnightMovesInDirection(Curr,Moves9,Board,Moves10,PosI,-2,-3),
+																getKnightMovesInDirection(Curr, Moves10,Board,Moves11,PosI,-2,1),
+																getKnightMovesInDirection(Curr, Moves11,Board,Moves,PosI,-3,-1).
+
+%% 1st quad
+getKnightMovesInDirection([],Moves,Board,Moves,PosI,A,B).						
+getKnightMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- H = [Piece,Turn,F,R],
+								R1 is R+B1,
+								F1 is F+A1,
+								\+member(piecePosition(_,_,F1,R1),Board),
+								inboard(F1,R1),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F1,R1]|M].
+
+getKnightMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- 	H = [Piece,Turn,F,R],
+								R1 is R+B1,
+								F1 is F+A1,
+								inboard(F1,R1),
+								switch(Turn,OpponentTurn),
+								member(piecePosition(_,OpponentTurn,F1,R1),Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F1,R1]|M];
+								Moves = M.
+/* KNIGHT MOVES END HERE */
+/*====================================================================================================================*/
 
 /* Checks if the position X,Y on the board is vacant */
 isVacant(piecePosition(_,_,X,Y), Board) :- \+member(piecePosition(_,_,X,Y), Board).
