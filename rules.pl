@@ -5,7 +5,7 @@
 /* =================================================================================================================================*/ 
 /* PAWN MOVES START HERE */
 
-getPawnMoves(piecePosition(Piece,Turn,X,Y), Board, Moves) :- getPawnMovesForInitialPosition(piecePosition(Piece,Turn,X,Y), Board, TempMoves),
+getPawnMoves(piecePosition(Piece,Turn,X,Y), Board, Moves) :- getPawnMovesForInitial(piecePosition(Piece,Turn,X,Y), Board, TempMoves),
                                                              addPawnAttackMoves(piecePosition(Piece,Turn,X,Y), Board, TempMoves, Moves).
 
 
@@ -46,7 +46,7 @@ getPawnMovesForInitial(piecePosition(Piece,1,1,5), Board, TempMoves) :- \+isVaca
 getPawnMovesForInitial(piecePosition(Piece,1,9,9), Board, TempMoves) :- isVacant(piecePosition(_,_,9,8), Board), !,
                                                                         TempMoves = [['pawn',9,9,9,8]].
 
-getPawnMovesForInitial(piecePosition(Piece,1,9,9), Board, TempMoves) :- \+isVacant(piecePosition(_,_,X,Y), Board), !,
+getPawnMovesForInitial(piecePosition(Piece,1,9,9), Board, TempMoves) :- \+isVacant(piecePosition(_,_,9,8), Board), !,
                                                                         TempMoves = [].
 
 /* Double Move possibilites */
@@ -120,11 +120,11 @@ getPawnMovesForInitial(piecePosition(Piece,1,3,7), Board, TempMoves) :- \+isVaca
                                                                         TempMoves = [].
 
 getPawnMovesForInitial(piecePosition(Piece,1,3,7), Board, TempMoves) :- isVacant(piecePosition(_,_,3,6), Board),
-                                                                        isVacant(piecePosition(_,_,3,5) !,
+                                                                        isVacant(piecePosition(_,_,3,5), Board) !,
                                                                         TempMoves = [['pawn',3,7,3,6],['pawn',3,7,3,5]].
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,1,3,7), Board, TempMoves) :- isVacant(piecePosition(_,_,3,6), Board),
-                                                                        \+isVacant(piecePosition(_,_,3,5) !,
+                                                                        \+isVacant(piecePosition(_,_,3,5), Board) !,
                                                                         TempMoves = [['pawn',3,7,3,6]].
                                                                            
 %(7,9)
@@ -165,12 +165,12 @@ getPawnMovesForInitial(piecePosition(Piece,0,4,2), Board, TempMoves) :- isVacant
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,0,4,2), Board, TempMoves) :- isVacant(piecePosition(_,_,4,3), Board),
                                                                         isVacant(piecePosition(_,_,4,4), Board),
-                                                                        \+isVacant(piecePosition(_,_,4,5)), !,
+                                                                        \+isVacant(piecePosition(_,_,4,5), Board), !,
                                                                         TempMoves = [['pawn',4,2,4,3],['pawn',4,2,4,4]].
 
 getPawnMovesForInitial(piecePosition(Piece,0,4,2), Board, TempMoves) :- isVacant(piecePosition(_,_,4,3), Board),
                                                                         isVacant(piecePosition(_,_,4,4), Board),
-                                                                        isVacant(piecePosition(_,_,4,5)), !,
+                                                                        isVacant(piecePosition(_,_,4,5), Board), !,
                                                                         TempMoves = [['pawn',4,2,4,3],['pawn',4,2,4,4],['pawn',4,2,4,5]].
 
 
@@ -184,12 +184,12 @@ getPawnMovesForInitial(piecePosition(Piece,0,5,2), Board, TempMoves) :- isVacant
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,0,5,2), Board, TempMoves) :- isVacant(piecePosition(_,_,5,3), Board),
                                                                         isVacant(piecePosition(_,_,5,4), Board),
-                                                                        \+isVacant(piecePosition(_,_,5,5)), !,
+                                                                        \+isVacant(piecePosition(_,_,5,5), Board), !,
                                                                         TempMoves = [['pawn',5,2,5,3],['pawn',5,2,5,4]].
 
 getPawnMovesForInitial(piecePosition(Piece,0,5,2), Board, TempMoves) :- isVacant(piecePosition(_,_,5,3), Board),
                                                                         isVacant(piecePosition(_,_,5,4), Board),
-                                                                        isVacant(piecePosition(_,_,5,5)), !,
+                                                                        isVacant(piecePosition(_,_,5,5), Board), !,
                                                                         TempMoves = [['pawn',5,2,5,3],['pawn',5,2,5,4],['pawn',5,2,5,5]].
 
 
@@ -203,12 +203,12 @@ getPawnMovesForInitial(piecePosition(Piece,0,6,3), Board, TempMoves) :- isVacant
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,0,6,3), Board, TempMoves) :- isVacant(piecePosition(_,_,6,4), Board),
                                                                         isVacant(piecePosition(_,_,6,5), Board),
-                                                                        \+isVacant(piecePosition(_,_,6,6)), !,
+                                                                        \+isVacant(piecePosition(_,_,6,6), Board), !,
                                                                         TempMoves = [['pawn',6,3,6,4],['pawn',6,3,6,5]].
 
 getPawnMovesForInitial(piecePosition(Piece,0,6,3), Board, TempMoves) :- isVacant(piecePosition(_,_,6,4), Board),
                                                                         isVacant(piecePosition(_,_,6,5), Board),
-                                                                        isVacant(piecePosition(_,_,6,6)), !,
+                                                                        isVacant(piecePosition(_,_,6,6), Board), !,
                                                                         TempMoves = [['pawn',6,3,6,4],['pawn',6,3,6,5],['pawn',6,3,6,6]].
 
 
@@ -223,12 +223,12 @@ getPawnMovesForInitial(piecePosition(Piece,1,4,8), Board, TempMoves) :- isVacant
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,1,4,8), Board, TempMoves) :- isVacant(piecePosition(_,_,4,7), Board),
                                                                         isVacant(piecePosition(_,_,4,6), Board),
-                                                                        \+isVacant(piecePosition(_,_,4,5)), !,
+                                                                        \+isVacant(piecePosition(_,_,4,5), Board), !,
                                                                         TempMoves = [['pawn',4,8,4,7],['pawn',4,8,4,6]].
 
 getPawnMovesForInitial(piecePosition(Piece,1,4,8), Board, TempMoves) :- isVacant(piecePosition(_,_,4,7), Board),
                                                                         isVacant(piecePosition(_,_,4,6), Board),
-                                                                        isVacant(piecePosition(_,_,4,5)), !,
+                                                                        isVacant(piecePosition(_,_,4,5), Board), !,
                                                                         TempMoves = [['pawn',4,8,4,7],['pawn',4,8,4,6],['pawn',4,8,4,5]].
 
 %(5,9)
@@ -241,12 +241,12 @@ getPawnMovesForInitial(piecePosition(Piece,1,5,9), Board, TempMoves) :- isVacant
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,1,5,9), Board, TempMoves) :- isVacant(piecePosition(_,_,5,8), Board),
                                                                         isVacant(piecePosition(_,_,5,7), Board),
-                                                                        \+isVacant(piecePosition(_,_,5,6)), !,
+                                                                        \+isVacant(piecePosition(_,_,5,6), Board), !,
                                                                         TempMoves = [['pawn',5,9,5,8],['pawn',5,9,5,7]].
 
 getPawnMovesForInitial(piecePosition(Piece,1,5,9), Board, TempMoves) :- isVacant(piecePosition(_,_,5,8), Board),
                                                                         isVacant(piecePosition(_,_,5,7), Board),
-                                                                        isVacant(piecePosition(_,_,5,6)), !,
+                                                                        isVacant(piecePosition(_,_,5,6), Board), !,
                                                                         TempMoves = [['pawn',5,9,5,8],['pawn',5,9,5,7],['pawn',5,9,5,6]].
 
 %(6,9)
@@ -259,12 +259,12 @@ getPawnMovesForInitial(piecePosition(Piece,1,6,9), Board, TempMoves) :- isVacant
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,1,6,9), Board, TempMoves) :- isVacant(piecePosition(_,_,6,8), Board),
                                                                         isVacant(piecePosition(_,_,6,7), Board),
-                                                                        \+isVacant(piecePosition(_,_,6,6)), !,
+                                                                        \+isVacant(piecePosition(_,_,6,6),Board), !,
                                                                         TempMoves = [['pawn',6,9,6,8],['pawn',6,9,6,7]].
 
 getPawnMovesForInitial(piecePosition(Piece,1,6,9), Board, TempMoves) :- isVacant(piecePosition(_,_,6,8), Board),
                                                                         isVacant(piecePosition(_,_,6,7), Board),
-                                                                        isVacant(piecePosition(_,_,6,6)), !,
+                                                                        isVacant(piecePosition(_,_,6,6),Board), !,
                                                                         TempMoves = [['pawn',6,9,6,8],['pawn',6,9,6,7],['pawn',6,9,6,6]].
 
 /* Moves for pawn if they are not in their initial positions */
@@ -280,6 +280,8 @@ getPawnMovesForOtherPosition(piecePosition(Piece,1,X,Y), Board, TempMoves) :- X1
                                                                               isVacant(piecePosition(_,_,X1,Y1), Board), 
                                                                               TempMoves = [['pawn',X,Y,X1,Y1]].
 
+getPawnMovesForOtherPosition(piecePosition(_,_,_,_),_,[]).
+
 /* Attacking positions */
 %For Human
 addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
@@ -291,8 +293,7 @@ addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
                                                               isWithinBoard(X2,Y2),
                                                               member(piecePosition(_,1,X1,Y1),Board),
                                                               member(piecePosition(_,1,X2,Y2),Board),
-                                                              append([['pawn',X,Y,X1,Y1],['pawn',X,Y,X2,Y2]], TempMoves, Moves).
-                                                                                           
+                                                              Moves = [['pawn',X,Y,X1,Y1],['pawn',X,Y,X2,Y2]|TempMoves].                            
 
 addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
                                                               X1 is X+1, 
@@ -302,7 +303,8 @@ addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
                                                               isWithinBoard(X1,Y1),
                                                               member(piecePosition(_,1,X1,Y1),Board),
                                                               \+member(piecePosition(_,1,X2,Y2),Board),
-                                                              Moves = [['pawn',X,Y,X1,Y1]|TempMoves].
+                                                              Moves = [['pawn',X,Y,X1,Y1]|TempMoves],print(Moves).
+                                                              
 
 addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
                                                               X1 is X+1, 
@@ -312,7 +314,8 @@ addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
                                                               isWithinBoard(X2,Y2),
                                                               \+member(piecePosition(_,1,X1,Y1),Board),
                                                               member(piecePosition(_,1,X2,Y2),Board),
-                                                              Moves = [['pawn',X,Y,X2,Y2]|TempMoves].     
+                                                              Moves = [['pawn',X,Y,X2,Y2]|TempMoves].    
+                                                               
 addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, TempMoves):-
                                                               X1 is X+1, 
                                                               Y1 is Y+1,
@@ -358,9 +361,9 @@ addPawnAttackMoves(piecePosition(Piece,1,X,Y), Board, TempMoves, Moves):-
                                                                   
 addPawnAttackMoves(piecePosition(Piece,1,X,Y), Board, TempMoves, TempMoves):-
                                                               X1 is X+1, 
-                                                              Y1 is Y+1,
+                                                              Y1 is Y,
                                                               X2 is X-1, 
-                                                              Y2 is Y,
+                                                              Y2 is Y-1,
                                                               \+member(piecePosition(_,0,X1,Y1),Board),
                                                               \+member(piecePosition(_,0,X2,Y2),Board).
 
@@ -530,7 +533,7 @@ getBishopMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- H = [Piece,Turn,F,R],
 								\+member(piecePosition(_,_,F1,R1),Board),
 								inboard(F1,R1),!,
 								PosI = [_,Turn,A,B],
-								getBishopMovesInDirection1([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
+								getBishopMovesInDirection([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI,A1,B1).
 
 getBishopMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- 	H = [Piece,Turn,F,R],
 								R1 is R+B1,
@@ -566,7 +569,6 @@ getKnightMoves(piecePosition(Piece,Turn,F,R), Board, Moves):-  Curr=[Piece,Turn,
 																getKnightMovesInDirection(Curr, Moves10,Board,Moves11,PosI,-2,1),
 																getKnightMovesInDirection(Curr, Moves11,Board,Moves,PosI,-3,-1).
 
-%% 1st quad
 getKnightMovesInDirection([],Moves,Board,Moves,PosI,A,B).						
 getKnightMovesInDirection( H, M,Board,Moves,PosI,A1,B1):- H = [Piece,Turn,F,R],
 								R1 is R+B1,
@@ -647,7 +649,7 @@ getQueenMoves(piecePosition(Piece,Turn,X,Y),Board,Moves):-  Curr=[Piece,F,R],
 isVacant(piecePosition(_,_,X,Y), Board) :- \+member(piecePosition(_,_,X,Y), Board).
 
 /* Checks if the given position is a valid position on the Board */
-isWithinBoard(X,R) :- inBoard(X,R).
+isWithinBoard(X,R) :- inboard(X,R).
 					
 inboard(1,R):-	R> 0,
                 R< 7.

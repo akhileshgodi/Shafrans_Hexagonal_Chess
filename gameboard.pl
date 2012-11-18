@@ -7,8 +7,8 @@ startHelper(Board) :- initialize(Board),
                        
 /* Helper function that will take input from the user as to who starts first and then continues */
 
-startPlay(Board) :- write('Enter 0 if you want to start playing, enter 1 if you want the computer to start first\n'),
-                    read(Turn), write('\n'), write(Turn).
+startPlay(Board) :- nl,write('Enter 0 if you want to start playing, enter 1 if you want the computer to start first\n'),
+                    read(Turn),!,nl,
                     play(Turn, Board).
 
 
@@ -66,45 +66,53 @@ piecePosition(_,_,_,_).
 
 /* This function starts the play */
 play(Turn, Board) :- checkGameOver(Turn, Board).
-play(Turn, Board) :- switchTurn(Turn, OpponentTurn),
-                     checkGameOver(OpponentTurn, Board),
+
+play(Turn, Board) :- switch(Turn, OpponentTurn),
+                     checkGameOver(OpponentTurn, Board).
+
 play(Turn, Board) :- getMove(Turn, Board, Move),
                      isValid(Turn, Move, Board),
-                     makeMove(Board, Move, ChangedBoard),
-                     switchTurn(Turn, OpponentTurn),
-                     play(OpponentTurn,Board).
+                     makeMove(Board, Move, Turn, ChangedBoard),
+                     printboard(ChangedBoard),nl,nl,
+                     switch(Turn, OpponentTurn),!,
+                     play(OpponentTurn,ChangedBoard).
 
-play(Turn, Board)	:- write('Invalid Move. Play again:'),
-	                   play(Turn,Board,Result).
+play(Turn, Board)	:- write('INVALID Move. Play again.'),nl,
+	                   play(Turn,Board).
 
-getMove(0, Board, Move) :- read(Move).
-getMove(1, Board, Move) :- getValidMoves(1, Board, [Move|_]).
+
+getMove(0, _, Move) :- read(Move),nl,nl,write('Move made by you was ').
+getMove(1, Board, Move) :- getValidMoves(1, Board, Moves),Moves = [Move|_],nl,nl,write('Computer made the move ').
 
 getValidMoves(Turn, [], Moves).
-getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|_],
-                                     PieceProps = piecePosition(Piece,Turn,X,Y),
-                                     getMoves(piecePosition(Piece,Turn,X,Y), Board, Moves1),
-                                     write(Moves1).
+getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|Rest],
+                                     PieceProps=piecePosition(Piece,Turn,X,Y),
+                                     getMoves(piecePosition(Piece,Turn,X,Y),Moves1,Board),
                                      append(Moves,Moves1,ResultMoves),
-                                     getValidMoves(Turn, Board, ResultMoves).
+                                     getValidMoves(Turn, Rest, ResultMoves).
                                      
+
+getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|Rest],
+                                     getValidMoves(Turn, Rest, Moves).
+                                                                          
 /* Switches whose turn it is to play */                                     
 switch(Turn,OpponentTurn) :- OpponentTurn is 1-Turn.
 
 /* Checks if game is over */
-checkGameOver(0, Board) :- \+member(piecePosition('king',Turn,_,_)),!,write('Human won the game').
-checkGameOver(1, Board) :- \+member(piecePosition('king',Turn,_,_)),!,write('Computer won the game').
+checkGameOver(0, Board) :- \+member(piecePosition('king',1,_,_),Board),!,write('Human won the game'),nl.
+checkGameOver(1, Board) :- \+member(piecePosition('king',0,_,_),Board),!,write('Computer won the game'),nl.
 
 /* Function to check if the given move is valid */
 isValid(Turn,Move,Board) :-  Move=[Piece,X1,Y1,X2,Y2],
                              member(piecePosition(Piece,Turn,X1,Y1),Board),
-                             getMoves(piecePosition(Piece,Turn,X1,Y1),Board,Moves),
+                             getMoves(piecePosition(Piece,Turn,X1,Y1),Moves,Board),
                              member([Piece,X1,Y1,X2,Y2],Moves).
                             
 /* Function that will actually change the move and update the board */
-makeMove(Board, Move, ChangedBoard) :-  Move = [Piece,X1,Y1,X2,Y2],!,
+makeMove(Board, Move, Turn, ChangedBoard) :-  Move = [Piece,X1,Y1,X2,Y2],!,
                                         removeFromBoard(Board, piecePosition(_,_,X1,Y1), TempBoard),
-                                        ChangedBoard = [piecePosition(Piece,Turn,X1,Y1)|TempBoard].
+                                        removeFromBoard(TempBoard, piecePosition(_,_,X2,Y2), TempBoard2),
+                                        ChangedBoard = [piecePosition(Piece,Turn,X2,Y2)|TempBoard2].
 
 /* 
  *Removes a piece from a board if the present move kills opponents piece, else, it just returns the Board
