@@ -364,9 +364,152 @@ addPawnAttackMoves(piecePosition(Piece,1,X,Y), Board, TempMoves, TempMoves):-
                                                               \+member(piecePosition(_,0,X1,Y1),Board),
                                                               \+member(piecePosition(_,0,X2,Y2),Board).
 
-
+/* PAWN MOVES END HERE */
 /*====================================================================================================================*/
 
+
+/*====================================================================================================================*/
+/* ROOK MOVES START HERE */
+getRookMoves(piecePosition(Piece,Turn,F,R), Board, Moves):-  
+                                                    Curr=[Piece,Turn,F,R],
+													PosI = [Piece,Turn,F,R],
+													getRookMovesInDirection1(Curr, [],Board,TempMoves1,PosI),
+													getRookMovesInDirection2(Curr, TempMoves1,Board,TempMoves2,PosI),
+													getRookMovesInDirection3(Curr, TempMoves2,Board,TempMoves3,PosI),
+													getRookMovesInDirection4(Curr, TempMoves3,Board,TempMoves4,PosI),
+													getRookMovesInDirection5(Curr, TempMoves4,Board,TempMoves5,PosI),
+													getRookMovesInDirection6(Curr, TempMoves5,Board,Moves,PosI).
+
+%% Along positive y axis
+getRookMovesInDirection1([],Moves,Board,Moves,PosI).						
+getRookMovesInDirection1( H, M,Board,Moves,PosI):- 
+                                H = [Piece,Turn,F,R],
+								R1 is R+1,
+								\+member(piecePosition(_,_,F,R1),Board),
+								inboard(F,R1),!,
+								PosI = [_,Turn,A,B],
+								getRookMovesInDirection1([Piece,Turn,F,R1],[[Piece,A,B,F,R1]| M ], Board, Moves,PosI).
+
+getRookMovesInDirection1( H, M,Board,Moves,PosI):- 	
+                                H = [Piece,Turn,F,R],
+								R1 is R+1,
+								inboard(F,R1),
+								switch(Turn,OpponentTurn),
+								member(piecePosition(_,OpponentTurn,F,R1),Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F,R1]|M];
+								Moves = M.
+								
+
+
+%% negative y axis
+getRookMovesInDirection2([],Moves,Board,Moves,PosI).						
+getRookMovesInDirection2( H, M,Board,Moves,PosI):- 
+                                H = [Piece,Turn,F,R],
+								R1 is R-1,
+								\+member(piecePosition(_,_,F,R1),Board),
+								inboard(F,R1),!,
+								PosI = [_,Turn,A,B],
+								getRookMovesInDirection2([Piece,Turn,F,R1],[[Piece,A,B,F,R1]| M ], Board, Moves,PosI).
+
+getRookMovesInDirection2( H, M,Board,Moves,PosI):- 	
+                                H = [Piece,Turn,F,R],
+								R1 is R-1,
+								inboard(F,R1),
+								switch(Turn,OpponentTurn),
+								member( piecePosition(_,OpponentTurn,F,R1), Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F,R1]|M];
+								Moves = M.
+
+
+%% 2nd quadrant
+getRookMovesInDirection3([],Moves,Board,Moves,PosI).						
+getRookMovesInDirection3( H, M,Board,Moves,PosI):- 
+                                H = [Piece,Turn,F,R],
+								F1 is F-1,
+								\+member(piecePosition(_,_,F1,R),Board),
+								inboard(F1,R),!,
+								PosI = [_,Turn,A,B],
+								getRookMovesInDirection3([Piece,Turn,F1,R],[[Piece,A,B,F1,R]| M ], Board, Moves,PosI).
+
+getRookMovesInDirection3( H, M,Board,Moves,PosI):- 	
+                                H = [Piece,Turn,F,R],
+								F1 is F-1,
+								inboard(F1,R),
+								switch(Turn,OpponentTurn),
+								member( piecePosition(_,OpponentTurn,F1,R), Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F1,R]|M];
+								Moves = M.
+								
+
+
+%% 4th quadrant
+getRookMovesInDirection4([],Moves,Board,Moves,PosI).						
+getRookMovesInDirection4( H, M,Board,Moves,PosI):- 
+                                H = [Piece,Turn,F,R],
+								F1 is F+1,
+								\+member(piecePosition(_,_,F1,R),Board),
+								inboard(F1,R),!,
+								PosI = [_,Turn,A,B],
+								getRookMovesInDirection4([Piece,Turn,F1,R],[[Piece,A,B,F1,R]| M ], Board, Moves,PosI).
+
+getRookMovesInDirection4( H ,M,Board,Moves,PosI):- 	
+                                H = [Piece,Turn,F,R],
+								F1 is F+1,
+								inboard(F1,R),
+								switch(Turn,OpponentTurn),
+								member( piecePosition(_,OpponentTurn,F1,R), Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F1,R]|M];
+								Moves = M.
+
+
+%% 	y=x (3rd quad)		
+getRookMovesInDirection5([],Moves,Board,Moves).						
+getRookMovesInDirection5( H, M,Board,Moves,PosI):- H = [Piece,Turn,F,R],
+								R1 is R-1,
+								F1 is F-1,
+								\+member(piecePosition(_,_,F1,R1),Board),
+								inboard(F1,R1),!,
+								PosI = [_,Turn,A,B],
+								getRookMovesInDirection5([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
+
+
+getRookMovesInDirection5( H, M,Board,Moves,PosI):- 	H = [Piece,Turn,F,R],
+								R1 is R-1,
+								F1 is F-1,
+								inboard(F1,R1),
+								switch(Turn,OpponentTurn),
+								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F1,R1]|M];
+								Moves = M.
+
+%% y = x (1st quad)
+getRookMovesInDirection6([],Moves,Board,Moves,PosI).						
+getRookMovesInDirection6( H, M,Board,Moves,PosI):- 
+                                H = [Piece,Turn,F,R],
+								R1 is R+1,
+								F1 is F+1,
+								\+member(piecePosition(_,_,F1,R1),Board),
+								inboard(F1,R1),!,
+								PosI = [_,Turn,A,B],
+								getRookMovesInDirection6([Piece,Turn,F1,R1],[[Piece,A,B,F1,R1]| M ], Board, Moves,PosI).
+
+getRookMovesInDirection6( H, M,Board,Moves,PosI):- 	
+                                H = [Piece,Turn,F,R],
+								R1 is R+1,
+								F1 is F+1,
+								inboard(F1,R1),
+								switch(Turn,OpponentTurn),
+								member( piecePosition(_,OpponentTurn,F1,R1), Board),!,
+								PosI = [_,Turn,A,B],
+								Moves = [[Piece,A,B,F1,R1]|M];
+								Moves = M.
+/* ROOK MOVES END HERE */
+/*====================================================================================================================*/
 
 
 /* Checks if the position X,Y on the board is vacant */

@@ -65,11 +65,17 @@ initialize( [
 piecePosition(_,_,_,_).                         
 
 /* This function starts the play */
+play(Turn, Board) :- checkGameOver(Turn, Board).
+play(Turn, Board) :- switchTurn(Turn, OpponentTurn),
+                     checkGameOver(OpponentTurn, Board),
 play(Turn, Board) :- getMove(Turn, Board, Move),
                      isValid(Turn, Move, Board),
-                     makeMove(Board, ChangedBoard, Move),
+                     makeMove(Board, Move, ChangedBoard),
                      switchTurn(Turn, OpponentTurn),
                      play(OpponentTurn,Board).
+
+play(Turn, Board)	:- write('Invalid Move. Play again:'),
+	                   play(Turn,Board,Result).
 
 getMove(0, Board, Move) :- read(Move).
 getMove(1, Board, Move) :- getValidMoves(1, Board, [Move|_]).
@@ -85,30 +91,44 @@ getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|_],
 /* Switches whose turn it is to play */                                     
 switch(Turn,OpponentTurn) :- OpponentTurn is 1-Turn.
 
-
+/* Checks if game is over */
+checkGameOver(0, Board) :- \+member(piecePosition('king',Turn,_,_)),!,write('Human won the game').
+checkGameOver(1, Board) :- \+member(piecePosition('king',Turn,_,_)),!,write('Computer won the game').
 
 /* Function to check if the given move is valid */
-isValid(Turn,Move,Board) :-  Move=[X1,Y1,X2,Y2],
-							 member(piecePosition(X1,Y1,Piece,CurrentPlayer),Board),
-						     getMoves(piecePosition(Piece,Turn,X1,Y1),Turn,Board,Moves),
-							 member([X2,Y2],Moves).
-							 
+isValid(Turn,Move,Board) :-  Move=[Piece,X1,Y1,X2,Y2],
+                             member(piecePosition(Piece,Turn,X1,Y1),Board),
+                             getMoves(piecePosition(Piece,Turn,X1,Y1),Board,Moves),
+                             member([Piece,X1,Y1,X2,Y2],Moves).
+                            
+/* Function that will actually change the move and update the board */
+makeMove(Board, Move, ChangedBoard) :-  Move = [Piece,X1,Y1,X2,Y2],!,
+                                        removeFromBoard(Board, piecePosition(_,_,X1,Y1), TempBoard),
+                                        ChangedBoard = [piecePosition(Piece,Turn,X1,Y1)|TempBoard].
 
+/* 
+ *Removes a piece from a board if the present move kills opponents piece, else, it just returns the Board
+ */                                        
+removeFromBoard(Board, A, Board) :- \+member(A,Board).
+removeFromBoard([A|Board], A, Board).
+removeFromBoard([B, C|D], A, [B|E]) :- removeFromBoard([C|D],A,E).
+
+                                  
 /* Function to get moves based on which piece on the board it is */
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'pawn',!,
                                                         getPawnMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
 
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'rook',!,
-                                                        getRookMoves(position(Piece,Turn,X,Y),Board,Moves).
+                                                        getRookMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
                                                         
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'bishop',!,
-                                                        getBishopMoves(position(Piece,Turn,X,Y),Board,Moves).
+                                                        getBishopMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
                                                         
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'knight',!,
-                                                        getKnightMoves(position(Piece,Turn,X,Y),Board,Moves).
+                                                        getKnightMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
                                                         
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'queen',!,
-                                                        getQueenMoves(position(Piece,Turn,X,Y),Board,Moves).
+                                                        getQueenMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
                                                         
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'king',!,
-                                                        getKingMoves(position(Piece,Turn,X,Y),Board,Moves).
+                                                        getKingMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
