@@ -82,7 +82,10 @@ play(Turn, Board)	:- write('INVALID Move. Play again.'),nl,
 
 
 getMove(0, _, Move) :- read(Move),nl,nl,write('Move made by you was ').
-getMove(1, Board, Move) :- getValidMoves(1, Board, Moves),Moves = [Move|_],nl,nl,write('Computer made the move ').
+getMove(1, Board, Move) :- getValidMoves(1, Board, Moves),
+                           Moves = [Move|_],nl,nl,
+                           %evaluate
+                           write('Computer made the move ').
 
 getValidMoves(Turn, [], Moves).
 getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|Rest],
