@@ -120,11 +120,11 @@ getPawnMovesForInitial(piecePosition(Piece,1,3,7), Board, TempMoves) :- \+isVaca
                                                                         TempMoves = [].
 
 getPawnMovesForInitial(piecePosition(Piece,1,3,7), Board, TempMoves) :- isVacant(piecePosition(_,_,3,6), Board),
-                                                                        isVacant(piecePosition(_,_,3,5), Board) !,
+                                                                        isVacant(piecePosition(_,_,3,5), Board), !,
                                                                         TempMoves = [['pawn',3,7,3,6],['pawn',3,7,3,5]].
                                                                            
 getPawnMovesForInitial(piecePosition(Piece,1,3,7), Board, TempMoves) :- isVacant(piecePosition(_,_,3,6), Board),
-                                                                        \+isVacant(piecePosition(_,_,3,5), Board) !,
+                                                                        \+isVacant(piecePosition(_,_,3,5), Board), !,
                                                                         TempMoves = [['pawn',3,7,3,6]].
                                                                            
 %(7,9)
@@ -303,7 +303,7 @@ addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
                                                               isWithinBoard(X1,Y1),
                                                               member(piecePosition(_,1,X1,Y1),Board),
                                                               \+member(piecePosition(_,1,X2,Y2),Board),
-                                                              Moves = [['pawn',X,Y,X1,Y1]|TempMoves],print(Moves).
+                                                              Moves = [['pawn',X,Y,X1,Y1]|TempMoves].
                                                               
 
 addPawnAttackMoves(piecePosition(Piece,0,X,Y), Board, TempMoves, Moves):-
@@ -637,7 +637,7 @@ getKingMoveInDirection( H, M,Board,Moves,PosI,A1,B1):- 	H = [Piece,Turn,F,R],
 getQueenMoves(piecePosition(Piece,Turn,X,Y),Board,Moves):-  Curr=[Piece,F,R],
 														    PosI = [Piece,F,R],
 														    getRookMoves(piecePosition(Piece,Turn,X,Y),Board,M),
-															getBishopMoves(piecePosition(Piece,Turn,X,Y),Board,N).
+														    getBishopMoves(piecePosition(Piece,Turn,X,Y),Board,N),
 															append(N,M,Moves).	
 
 /* QUEEN MOVES END HERE */
