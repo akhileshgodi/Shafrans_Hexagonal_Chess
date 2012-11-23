@@ -70,7 +70,7 @@ play(Turn, Board) :- checkGameOver(Turn, Board).
 play(Turn, Board) :- switch(Turn, OpponentTurn),
                      checkGameOver(OpponentTurn, Board).
 
-play(Turn, Board) :- getMove(Turn, Board, Move),
+play(Turn, Board) :- getMove(Turn, Board, Move),!,
                      isValid(Turn, Move, Board),
                      makeMove(Board, Move, Turn, ChangedBoard),
                      write(Move),nl,
@@ -78,26 +78,28 @@ play(Turn, Board) :- getMove(Turn, Board, Move),
                      switch(Turn, OpponentTurn),!,
                      play(OpponentTurn,ChangedBoard).
 
-play(Turn, Board)	:- write('INVALID Move. Play again.').nl,
+play(Turn, Board)	:- write('INVALID Move. Play again.'),nl,
 	                   play(Turn,Board).
 
 
 getMove(0, _, Move) :- read(Move),nl,nl,write('Move made by you was ').
-getMove(1, Board, Move) :- %getValidMoves(1,Board,Moves),nl,
+getMove(1, Board, Move) :- %getValidMoves(1,Board,Moves,Board),nl,
                            %Moves = [X,Y,Move|_],nl,nl,
-                           alpha_beta(1,1,-10000,10000,Move,Value,Board),
+                           alpha_beta(1,1,-10000000,10000000,Move,Value,Board),!,
+                           write(Move),nl,
                            %evaluate
                            write('Computer made the move ').
 
-getValidMoves(Turn, [], []).
-getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|Rest],
+getValidMoves(Turn, [], [],ActualBoard).
+getValidMoves(Turn, Board, Moves,ActualBoard) :- Board = [PieceProps|Rest],
                                      PieceProps=piecePosition(Piece,Turn,X,Y),
-                                     getMoves(piecePosition(Piece,Turn,X,Y),Moves1,Board),
-                                     getValidMoves(Turn, Rest, ResultMoves), append(Moves1,ResultMoves,Moves).
+                                     getMoves(piecePosition(Piece,Turn,X,Y),Moves1,ActualBoard),
+                                     getValidMoves(Turn, Rest, ResultMoves,ActualBoard), 
+                                     append(Moves1,ResultMoves,Moves).
                                      
 
-getValidMoves(Turn, Board, Moves) :- Board = [PieceProps|Rest],
-                                     getValidMoves(Turn, Rest, Moves).
+getValidMoves(Turn, Board, Moves,ActualBoard) :- Board = [PieceProps|Rest],
+                                     getValidMoves(Turn, Rest, Moves, ActualBoard).
                                                                           
 /* Switches whose turn it is to play */                                     
 switch(Turn,OpponentTurn) :- OpponentTurn is 1-Turn.
@@ -146,25 +148,67 @@ getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'queen',!,
                                                         
 getMoves(piecePosition(Piece,Turn,X,Y),Moves,Board)	:-  Piece = 'king',!,
                                                         getKingMoves(piecePosition(Piece,Turn,X,Y),Board,Moves).
-                                                        
+
+getBoardValue(Board,Turn,Value) :-  Board = [piecePosition(Piece,Color,X,Y)|TempBoard],
+            				        getValue(Piece, Color, X, Y,Turn,Board,Val),
+            				        getBoardValue(TempBoard,Turn,Temp1),
+									Value is Val + Temp1.
+
+getBoardValue(_,_,Value) :- Value is 0.
+
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece,Color,X,Y),Board), Color = Turn,
+										        Piece = 'king',Value = 10000.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece,Color,X,Y),Board), Color = 1-Turn,
+										        Piece = 'king',Value = -8000.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = Turn,
+										        Piece = 'queen',Value = 5000.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = 1-Turn,
+										        Piece = 'queen',Value = -2500.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = Turn,
+										        Piece = 'bishop',Value = 3000.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = 1-Turn,
+										        Piece = 'bishop',Value = -1500.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = Turn,
+										        Piece = 'knight',Value = 2500.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = 1-Turn,
+										        Piece = 'knight',Value = -1250.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = Turn,
+										        Piece = 'rook',Value = 2000.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = 1-Turn,
+										        Piece = 'rook',Value = -1000.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = Turn,
+										        Piece = 'pawn',Value = 700.
+										
+getValue(Piece, Color, X, Y,Turn,Board,Value) :-	member(piecePosition(Piece, Color, X, Y),Board), Color = 1-Turn,
+					                            Piece = 'pawn',Value = -350.
+										                            
+										                            
 alpha_beta(Turn,0,_Alpha,_Beta,_NoMove,Value,Board) :- 
-    Value is 1000,
-    getBoardValue(Board,Value).
+    getBoardValue(Board,Turn,Value).
 
 alpha_beta(Turn,D,Alpha,Beta,Move,Value,Board) :- 
    D > 0, 
-   getValidMoves(Turn,Board,Moves),
+   getValidMoves(Turn,Board,Moves,Board),
    Alpha1 is -Beta, % max/min
    Beta1 is -Alpha,
    D1 is D-1,
-   evaluate_and_choose(Turn,Moves,Board,D1,Alpha1,Beta1,nil,(Move,Value)).
+   evaluate_and_choose(Turn,Moves,Board,D1,Alpha1,Beta1,nil,(Move,Value)),write('Got : '),write(Move),nl.
 
 evaluate_and_choose(_Player,[],_Board,_D,Alpha,_Beta,Move,(Move,Alpha)).
 
 evaluate_and_choose(Player,[Move|Moves],Board,D,Alpha,Beta,Record,BestMove) :-
    makeMove(Board, Move, Turn, ChangedBoard),
    switch(Player,OtherPlayer),                  
-   write(D),nl,
    alpha_beta(OtherPlayer,D,Alpha,Beta,_OtherMove,Value,ChangedBoard),!,
    Value1 is -Value,
    cutoff(Player,Move,Value1,D,Alpha,Beta,Moves,Board,Record,BestMove).
@@ -180,4 +224,3 @@ cutoff(Player,Move,Value,D,Alpha,Beta,Moves,Board,Record,BestMove) :-
    Value =< Alpha, !, 
    evaluate_and_choose(Player,Moves,Board,D,Alpha,Beta,Record,BestMove).
 
-getBoardValue(X,Y).
